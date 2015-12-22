@@ -7,13 +7,13 @@ module test_neurocore;
 
 parameter STEP = 10;
 
-    wire [31:0]weight_addr;
+    wire [15:0]weight_addr;
     wire [31:0]weight_din;
     wire [31:0]weight_dout;
     wire weight_en=1'b1;
     wire [3:0]weight_we;
 
-    wire [31:0]data_addr;
+    wire [15:0]data_addr;
     wire [31:0]data_din;
     wire [31:0]data_dout;
     wire data_en=1'b1;
@@ -48,7 +48,7 @@ parameter STEP = 10;
       
    .inst_addr(inst_addr),
    .inst_din(inst_din),
-   .inst_dout(inst_dout),
+   .inst_dout_dummy(inst_dout),
    .inst_en(inst_en),
    .inst_we(inst_we)
    );
@@ -60,7 +60,7 @@ parameter STEP = 10;
         .clka(clk),
         .ena(data_en),
         .wea(data_we),
-        .addra(data_addr),
+        .addra({16'h0000,data_addr}),
         .dina(data_din),
         .douta(data_dout)
       );   
@@ -71,7 +71,7 @@ parameter STEP = 10;
          .clka(clk),
          .ena(weight_en),
          .wea(weight_we),
-         .addra(weight_addr),
+         .addra({16'h0000,weight_addr}),
          .dina(weight_din),
          .douta(weight_dout)
       );   
@@ -94,17 +94,18 @@ parameter STEP = 10;
    #STEP
    #STEP
       rst_n <= `DISABLE_N;
-   #(STEP*4*18)            
+   #(STEP*3/4)
+   #(STEP*4*30)            
    $finish;
    end
-/*
+
    always @(negedge clk) begin
-      $display("stat:%b pc:%h ir:%b", poco_1.stat, poco_1.pc, poco_1.ir);
+      $display("stat:%b pc:%h ir:%b", neurocore_1.stat, neurocore_1.inst_addr, neurocore.inst_dout);
       $display("reg:%h %h %h %h %h %h %h %h", 
-	poco_1.rfile_1.r0, poco_1.rfile_1.r1, poco_1.rfile_1.r2,
-	poco_1.rfile_1.r3, poco_1.rfile_1.r4, poco_1.rfile_1.r5,
-	poco_1.rfile_1.r6, poco_1.rfile_1.r7);
-      $display("mem:%h %h %h %h", mem[16'h10], mem[16'h11], mem[16'h12], mem[16'h13]);
+	neurocore_1.rfile_1.r0, neurocore_1.rfile_1.r1, neurocore_1.rfile_1.r2,
+	neurocore_1.rfile_1.r3, neurocore_1.rfile_1.r4, neurocore_1.rfile_1.r5,
+	neurocore_1.rfile_1.r6, neurocore_1.rfile_1.r7);
+      $display("mem:%h %h %h %h", data_dout[32'h00000000], data_dout[32'h00000002], data_dout[32'h00000003], data_dout[32'h00000004]);
    end
-*/   
+
 endmodule

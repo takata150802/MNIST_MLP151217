@@ -7,7 +7,7 @@ module rfile (
  input rfile_we);
                                                          /*$PC $CN $FR $TR $MR $SIZE*/
 	//reg [`REG_W-1:0] r0, r1, r2, r3, r4, r5, r6, r7,r8,r9,r10,r11,r12,r13,r14,r15;
-	reg [`REG_W-1:0] r0=16'h0000, r1=16'h1111, r2=16'h2222, r3=16'h3333, r4=16'h4444, r5=16'h5555, r6=16'h6666, r7=16'h7777,r8=16'h8888,r9=16'h9999,r10=16'hAAAA,r11=16'hBBBB,r12=16'hCCCC,r13=16'hDDDD,r14=16'hEEEE,r15=16'hFFFF;
+	reg [`REG_W-1:0] r0=16'h0002, r1=16'h000a, r2=16'h0006, r3=16'h0003, r4=16'h0000, r5=16'h000f, r6=16'h000d, r7=16'h000e,r8=16'h000b,r9=16'h000c,r10=16'h0001,r11=16'h0007,r12=16'h0004,r13=16'h0009,r14=16'h0005,r15=16'h0008;
 
 	assign a = aadr == 0 ? r0:
 		aadr == 1 ? r1:
