@@ -26,7 +26,7 @@ assign weight_we=3'b000;
 assign inst_we=1'b0; 
 /***************命令パイプライン化に向けて**********************/
 wire [15:0]inst_dout;
-assign inst_dout = (stat[`ID])?inst_dout_dummy:16'h0XX0;
+assign inst_dout = (stat[`ID])?inst_dout_dummy:16'h0000;
 
     
 /***************STATE_MANAGER***********************/
@@ -123,8 +123,11 @@ assign weight_addr = (rIDEX_all_ops[`LD])?rIDEXd:16'h0000;
 reg [1:0] rEXWB_data_addr_LS2b;
 always @(posedge clk) begin rEXWB_data_addr_LS2b <= rIDEXc[1:0]; end
     //Store $rd $rs SRAM[$rs] <=(16bitに切り捨て) RegFile[$rd]
-assign data_we = ( rIDEX_all_ops[`ST])?((rIDEXc[1:0]==2'b00)?4'b1000:(rIDEXc[1:0]==2'b01)?4'b0100:(rIDEXc[1:0]==2'b10)?4'b0010:4'b0001):4'b0000;
-//assign data_din = ( rIDEX_all_ops[`ST])?32'h00000006 :32'h00000000;
+assign data_we = ( rIDEX_all_ops[`ST])?
+                                (       (rIDEXc[1:0]==2'b00)?4'b1000:
+                                        (rIDEXc[1:0]==2'b01)?4'b0100:
+                                        (rIDEXc[1:0]==2'b10)?4'b0010:4'b0001)
+                                 :4'b0000;
 assign data_din = ( rIDEX_all_ops[`ST])?( (rIDEXc[1:0]==2'b00)?{rIDEXa[15:8],24'h000000}:(rIDEXc[1:0]==2'b01)?({rIDEXa[15:8],24'h000000}>>8):(rIDEXc[1:0]==2'b10)?({rIDEXa[15:8],24'h000000}>>16):{24'h000000,rIDEXa[15:8]}):32'h00000000;
 //                                        //({rIDEXa[15:8],24'h000000}>>8)
 reg [`DATA_W-1:0] rEXWBa;
@@ -146,59 +149,4 @@ rfile rfile_1(.clk(clk), .a(rf_a), .aadr(rd), .b(rf_b), .badr(rs), .c(wire_rEXWB
 //PC
 PCadder PCadder_1( .clk(clk), .rst_n(rst_n),  .stat(stat), .inst_addr(inst_addr), .imm_bneq(rEXWB_imm_bneq) );
 //151220tkt//
-
-/*
-
-
-always @(posedge clk) 
-   if(stat[`ID]) alu_a <= rf_a;
-
-always @(posedge clk) 
-   if(stat[`ID]) 
-     if(addi_op | addiu_op )
-	com <= `ALU_ADD; 
-     else if (ldi_op | ldiu_op | ldhi_op) 
-	com <= `ALU_THB;
-     else com <= func[`SEL_W-1:0];
-
-always @(posedge clk)
-begin
-     if(stat[`EX]) begin
-         if(ld_op)
-                rf_c <= datain;
-         else if(jal_op)
-                rf_c <= pc;
-         else  rf_c <= alu_y;
-     end
-end
-
-assign rweop =
-	(ld_op  | alu_op | ldi_op | ldiu_op | addi_op | addiu_op | ldhi_op
-                | jal_op) ;
-
-assign rwe = stat[`WB] & rweop;
-
-assign cadr = jal_op ? 3'b111 : rd;
-alu alu_1(.a(alu_a), .b(alu_b), .s(com), .y(alu_y));
-
-rfile rfile_1(.clk(clk), .a(rf_a), .aadr(rd), .b(rf_b), .badr(rs), 
-	.c(rf_c), .cadr(cadr), .we(rwe));
-
-assign pcsel = (bez_op & rf_a == 16'b0 ) | (bnz_op & rf_a != 16'b0) |
-              (bmi_op & rf_a[15] == 1 ) | (bpl_op & rf_a[15] == 0) ;
-*/
-
-//  pc
-
-
-/*always @(posedge clk or negedge rst_n) 
-begin 
-   if(!rst_n) pc <= 0;
-   else if(stat[`IF])
-     pc <= pc+1;
-end*/
-
-//  state
-
-
 endmodule

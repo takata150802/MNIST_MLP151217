@@ -9,7 +9,8 @@ parameter STEP = 10;
 
     reg [31:0]data_addr=0;
     reg [31:0]data_din;
-    wire [31:0]data_dout;
+    wire [31:0]data_dout_1;
+    wire [31:0]data_dout_2;
     reg data_en=1'b1;
     reg [3:0]data_we=0;
 always @(posedge clk)
@@ -36,16 +37,26 @@ always @(posedge clk)
    end
 
 
-    data_ram_model data_ram_model
+    data_ram_model data_ram_model_1
       (
         .rsta(~rst_n),
         .clka(clk),
         .ena(data_en),
         .wea(data_we),
-        .addra(data_addr |16'hzzzz),
+        .addra(data_addr),
         .dina(data_din),
-        .douta(data_dout)
+        .douta(data_dout_1)
       );   
+    data_ram_model_2 data_ram_model_2
+        (
+          .rsta(~rst_n),
+          .clka(clk),
+          .ena(data_en),
+          .wea(data_we),
+          .addra(data_addr),//.addra(data_addr |16'hzzzz),
+          .dina(data_din),
+          .douta(data_dout_2)
+        );   
       
 /*    weight_ram_model weight_ram_model
        (
